@@ -1,0 +1,3 @@
+[submodule "LuaInterface"]
+	path = LuaInterface
+	url = git@github.com:glua/LuaInterface.git
