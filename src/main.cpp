@@ -30,14 +30,14 @@ int randomBytes(lua_State* state) {
 	}
 
 	std::random_device rd;
-	std::string bytes;
+	std::vector<unsigned int> bytes;
 	bytes.resize(size);
 
 	for (size_t i = 0; i < size; i++) {
 		bytes[i] = rd();
 	}
 
-	LUA->PushString(bytes.c_str());
+	LUA->PushString((const char*)bytes.data(), size);
 
 	return 1;
 }
