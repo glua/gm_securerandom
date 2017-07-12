@@ -23,7 +23,7 @@ int randomNumber(lua_State* state) {
 int randomBytes(lua_State* state) {
 	LUA->CheckType(1, GarrysMod::Lua::Type::NUMBER);
 	const double requestedSize = LUA->GetNumber(1);
-	const unsigned int size = floor(LUA->GetNumber(1));
+	const size_t size = floor(LUA->GetNumber(1));
 
 	if (requestedSize < 0 || size != requestedSize) {
 		LUA->ThrowError("size must be a whole number >= 0");
@@ -31,9 +31,10 @@ int randomBytes(lua_State* state) {
 
 	std::random_device rd;
 	std::string bytes;
+	bytes.resize(size);
 
-	for (unsigned int i = 0; i < size; i++) {
-		bytes += rd();
+	for (size_t i = 0; i < size; i++) {
+		bytes[i] = rd();
 	}
 
 	LUA->PushString(bytes.c_str());
