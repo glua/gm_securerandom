@@ -1,10 +1,12 @@
 #include "GarrysMod/Lua/Interface.h"
 #include <random>
-#include <string>
+#include <climits>
+#include <vector>
 
 int randomNumber(lua_State* state) {
 	std::random_device rd;
 	std::mt19937 gen(rd());
+	gen.discard(700000); // http://www.iro.umontreal.ca/~lecuyer/myftp/papers/lfsr04.pdf page 11
 
 	if (LUA->GetType(1) != GarrysMod::Lua::Type::NIL) {
 		LUA->CheckType(1, GarrysMod::Lua::Type::NUMBER);
@@ -30,14 +32,15 @@ int randomBytes(lua_State* state) {
 	}
 
 	std::random_device rd;
-	std::vector<unsigned int> bytes;
+	std::uniform_int_distribution<int> dist(SCHAR_MIN, SCHAR_MAX);
+	std::vector<char> bytes;
 	bytes.resize(size);
 
 	for (size_t i = 0; i < size; i++) {
-		bytes[i] = rd();
+		bytes[i] = (char)dist(rd);
 	}
 
-	LUA->PushString((const char*)bytes.data(), size);
+	LUA->PushString(bytes.data(), size);
 
 	return 1;
 }
