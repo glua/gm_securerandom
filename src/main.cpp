@@ -3,11 +3,10 @@
 #include <climits>
 #include <vector>
 
-int randomNumber(lua_State* state) {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	gen.discard(700000); // http://www.iro.umontreal.ca/~lecuyer/myftp/papers/lfsr04.pdf page 11
+std::random_device rd;
+std::mt19937 gen;
 
+int randomNumber(lua_State* state) {
 	if (LUA->GetType(1) != GarrysMod::Lua::Type::NIL) {
 		LUA->CheckType(1, GarrysMod::Lua::Type::NUMBER);
 		LUA->CheckType(2, GarrysMod::Lua::Type::NUMBER);
@@ -31,7 +30,6 @@ int randomBytes(lua_State* state) {
 		LUA->ThrowError("size must be a whole number >= 0");
 	}
 
-	std::random_device rd;
 	std::uniform_int_distribution<int> dist(SCHAR_MIN, SCHAR_MAX);
 	std::vector<char> bytes;
 	bytes.resize(size);
@@ -46,6 +44,9 @@ int randomBytes(lua_State* state) {
 }
 
 GMOD_MODULE_OPEN() {
+	gen.seed(rd());
+	gen.discard(700000); // http://www.iro.umontreal.ca/~lecuyer/myftp/papers/lfsr04.pdf page 11
+
 	LUA->PushSpecial(GarrysMod::Lua::SPECIAL_GLOB);
 		LUA->CreateTable();
 			LUA->PushCFunction(randomNumber);
