@@ -7,14 +7,55 @@ std::random_device rd;
 std::mt19937 gen;
 
 int randomNumber(lua_State* state) {
-	if (LUA->GetType(1) != GarrysMod::Lua::Type::NIL) {
-		LUA->CheckType(1, GarrysMod::Lua::Type::NUMBER);
-		LUA->CheckType(2, GarrysMod::Lua::Type::NUMBER);
+	if (LUA->GetType(1) != GarrysMod::Lua::Type::NIL) {	//Check if we have the first argument
+		LUA->CheckType(1, GarrysMod::Lua::Type::NUMBER);	//Verify the first argument is a number
 
-		std::uniform_real_distribution<double> dist(LUA->GetNumber(1), LUA->GetNumber(2));
-		LUA->PushNumber(dist(gen));
+		if (LUA->GetType(2) != GarrysMod::Lua::Type::NIL) {	//Check if we have the second argument
+			LUA->CheckType(2, GarrysMod::Lua::Type::NUMBER);	//Verify the second argument is a number
+
+			//Push our random number between the first and second argument
+			std::uniform_real_distribution<double> dist(LUA->GetNumber(1), LUA->GetNumber(2));
+			LUA->PushNumber(dist(gen));
+		} else {
+			//Added in by The Owl Cafe
+			//Purpose: To make it behave fully like the math.random function in glua, effectively allowing it to fully replace math.random
+
+			//We only have the first argument
+			//We return a number between 1 and the second argument
+			std::uniform_real_distribution<double> dist( 1.0, LUA->GetNumber(1));
+			LUA->PushNumber(dist(gen));
+		}
 	} else {
+		//Return a random number between 0 and 1
 		std::uniform_real_distribution<double> dist;
+		LUA->PushNumber(dist(gen));
+	}
+
+	return 1;
+}
+
+int randomWholeNumber(lua_State* state) {
+	if (LUA->GetType(1) != GarrysMod::Lua::Type::NIL) {	//Check if we have the first argument
+		LUA->CheckType(1, GarrysMod::Lua::Type::NUMBER);	//Verify the first argument is a number
+
+		if (LUA->GetType(2) != GarrysMod::Lua::Type::NIL) {	//Check if we have the second argument
+			LUA->CheckType(2, GarrysMod::Lua::Type::NUMBER);	//Verify the second argument is a number
+
+			//Push our random number between the first and second argument
+			std::uniform_real_distribution<int> dist(LUA->GetNumber(1), LUA->GetNumber(2));
+			LUA->PushNumber(dist(gen));
+		} else {
+			//Added in by The Owl Cafe
+			//Purpose: To make it behave fully like the math.random function in glua, effectively allowing it to fully replace math.random
+
+			//We only have the first argument
+			//We return a number between 1 and the second argument
+			std::uniform_real_distribution<int> dist( 1, LUA->GetNumber(1));
+			LUA->PushNumber(dist(gen));
+		}
+	} else {
+		//Return a random number between 0 and 1
+		std::uniform_real_distribution<int> dist;
 		LUA->PushNumber(dist(gen));
 	}
 
@@ -51,6 +92,10 @@ GMOD_MODULE_OPEN() {
 		LUA->CreateTable();
 			LUA->PushCFunction(randomNumber);
 			LUA->SetField(-2, "Number");
+	
+			//Same as random.Number, but should provide a whole number instead of a decimal
+			LUA->PushCFunction(randomWholeNumber);
+			LUA->SetField(-2, "WholeNumber");
 
 			LUA->PushCFunction(randomBytes);
 			LUA->SetField(-2, "Bytes");
