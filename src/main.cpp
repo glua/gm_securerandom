@@ -42,7 +42,7 @@ int randomWholeNumber(lua_State* state) {
 			LUA->CheckType(2, GarrysMod::Lua::Type::NUMBER);	//Verify the second argument is a number
 
 			//Push our random number between the first and second argument
-			std::uniform_real_distribution<int> dist(LUA->GetNumber(1), LUA->GetNumber(2));
+			std::uniform_int_distribution<int> dist(LUA->GetNumber(1), LUA->GetNumber(2));
 			LUA->PushNumber(dist(gen));
 		} else {
 			//Added in by The Owl Cafe
@@ -50,12 +50,12 @@ int randomWholeNumber(lua_State* state) {
 
 			//We only have the first argument
 			//We return a number between 1 and the second argument
-			std::uniform_real_distribution<int> dist( 1, LUA->GetNumber(1));
+			std::uniform_int_distribution<int> dist( 1, LUA->GetNumber(1));
 			LUA->PushNumber(dist(gen));
 		}
 	} else {
 		//Return a random number between 0 and 1
-		std::uniform_real_distribution<int> dist;
+		std::uniform_int_distribution<int> dist;
 		LUA->PushNumber(dist(gen));
 	}
 
